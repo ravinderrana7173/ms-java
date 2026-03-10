@@ -54,7 +54,7 @@ pipeline {
             echo $HPASS | sudo nerdctl login 192.168.80.140 -u $HUSER --password-stdin --insecure-registry
             
             # Push the image
-            sudo nerdctl push 192.168.80.140/dev/java-ms-demo:1.0
+            sudo nerdctl push 192.168.80.140:80/dev/java-ms-demo:1.0
             '''
         }
     }
