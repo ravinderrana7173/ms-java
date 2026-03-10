@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "192.168.80.140/dev/java-ms-demo"
-        IMAGE_TAG  = "1.0"
-        SONAR_HOST_URL = "http://192.168.80.140:9000"   // Change if Jenkins runs on a different host
-        SONAR_LOGIN = credentials('sonar-token')   // Optional: SonarQube authentication token
+        IMAGE_NAME     = "192.168.80.140/dev/java-ms-demo"
+        IMAGE_TAG      = "1.0"
+        SONAR_HOST_URL = "http://192.168.80.140:9000"  // SonarQube server URL
+        SONAR_LOGIN    = credentials('sonar-token')   // SonarQube authentication token
     }
 
     stages {
@@ -26,19 +26,19 @@ pipeline {
             steps {
                 // Use the server URL and token explicitly
                 sh """
-                mvn sonar:sonar \
-                    -Dsonar.projectKey=demo \
-                    -Dsonar.host.url=$SONAR_HOST_URL \
-                    -Dsonar.login=$SONAR_LOGIN
+                    mvn sonar:sonar \
+                        -Dsonar.projectKey=demo \
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.login=$SONAR_LOGIN
                 """
             }
         }
 
         stage('Build Container Image') {
             steps {
-                sh '''
-                sudo nerdctl build -t $IMAGE_NAME:$IMAGE_TAG .
-                '''
+                sh """
+                    sudo nerdctl build -t $IMAGE_NAME:$IMAGE_TAG .
+                """
             }
         }
 
@@ -49,10 +49,10 @@ pipeline {
                     usernameVariable: 'HUSER',
                     passwordVariable: 'HPASS'
                 )]) {
-                    sh '''
-                    echo $HPASS | sudo nerdctl login harbor.local -u $HUSER --password-stdin
-                    sudo nerdctl push $IMAGE_NAME:$IMAGE_TAG
-                    '''
+                    sh """
+                        echo \$HPASS | sudo nerdctl login 192.168.80.140 -u \$HUSER --password-stdin
+                        sudo nerdctl push \$IMAGE_NAME:\$IMAGE_TAG
+                    """
                 }
             }
         }
@@ -60,10 +60,10 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    sh '''
-                    kubectl apply -f deployment.yaml
-                    kubectl apply -f service.yaml
-                    '''
+                    sh """
+                        kubectl apply -f deployment.yaml
+                        kubectl apply -f service.yaml
+                    """
                 }
             }
         }
