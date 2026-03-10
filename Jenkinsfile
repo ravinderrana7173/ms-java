@@ -43,19 +43,19 @@ pipeline {
         }
 
         stage('Push Image to Harbor') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'harbor-creds',
-                    usernameVariable: 'HUSER',
-                    passwordVariable: 'HPASS'
-                )]) {
-                    sh """
-                        echo \$HPASS | sudo nerdctl login 192.168.80.140 -u \$HUSER --password-stdin
-                        sudo nerdctl push \$IMAGE_NAME:\$IMAGE_TAG
-                    """
-                }
-            }
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: 'harbor-creds',
+            usernameVariable: 'admin',
+            passwordVariable: 'Harbor12345'
+        )]) {
+            sh """
+                echo \$HPASS | sudo nerdctl login 192.168.80.140 --username \$HUSER --password-stdin --tls-verify=false
+                sudo nerdctl push \$IMAGE_NAME:\$IMAGE_TAG
+            """
         }
+    }
+}
 
         stage('Deploy to Kubernetes') {
             steps {
