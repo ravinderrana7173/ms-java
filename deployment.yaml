@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-ms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: java-ms
+  template:
+    metadata:
+      labels:
+        app: java-ms
+    spec:
+      containers:
+      - name: java-ms
+        image: java-ms-demo:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
