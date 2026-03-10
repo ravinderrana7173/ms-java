@@ -1,20 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: java-ms
+  name: java-ms-demo
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: java-ms
+      app: java-ms-demo
   template:
     metadata:
       labels:
-        app: java-ms
+        app: java-ms-demo
     spec:
       containers:
-      - name: java-ms
-        image: java-ms-demo:1.0
-        imagePullPolicy: IfNotPresent
+      - name: java-ms-demo
+        image: harbor.local/dev/java-ms-demo:1.0
         ports:
         - containerPort: 8080
