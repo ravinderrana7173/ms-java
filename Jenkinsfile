@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "harbor.local/dev/java-ms-demo"
+        IMAGE_NAME = "192.168.80.140/dev/java-ms-demo"
         IMAGE_TAG  = "1.0"
         SONAR_HOST_URL = "http://192.168.80.140:9000"   // Change if Jenkins runs on a different host
         SONAR_LOGIN = credentials('sonar-token')   // Optional: SonarQube authentication token
