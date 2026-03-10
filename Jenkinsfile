@@ -49,10 +49,13 @@ pipeline {
             usernameVariable: 'HUSER',
             passwordVariable: 'HPASS'
         )]) {
-            sh """
-                echo \$HPASS | sudo nerdctl login 192.168.80.140 --username \$HUSER --password-stdin
-                sudo nerdctl push \$IMAGE_NAME:\$IMAGE_TAG
-            """
+            sh '''
+            # Log in using HTTP and skip TLS
+            echo $HPASS | sudo nerdctl login 192.168.80.140 -u $HUSER --password-stdin --insecure-registry
+            
+            # Push the image
+            sudo nerdctl push 192.168.80.140/dev/java-ms-demo:1.0
+            '''
         }
     }
 }
