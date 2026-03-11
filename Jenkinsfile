@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME     = "192.168.80.140/dev/java-ms-demo"
+        IMAGE_NAME     = "192.168.80.140:80/dev/java-ms-demo"
         IMAGE_TAG      = "1.0"
         SONAR_HOST_URL = "http://192.168.80.140:9000"  // SonarQube server URL
         SONAR_LOGIN    = credentials('sonar-token')   // SonarQube authentication token
