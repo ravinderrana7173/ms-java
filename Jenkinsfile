@@ -35,12 +35,13 @@ pipeline {
         }
 
         stage('Build Container Image') {
-            steps {
-                sh """
-                    sudo nerdctl build -t $IMAGE_NAME:$IMAGE_TAG .
-                """
-            }
-        }
+    steps {
+        sh '''
+        sudo nerdctl image prune -f || true
+        sudo nerdctl build -t $IMAGE_NAME:$IMAGE_TAG .
+        '''
+    }
+}
 
         stage('Push Image to Harbor') {
     steps {
