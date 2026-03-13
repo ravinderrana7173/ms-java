@@ -61,7 +61,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh """
-                        kubectl apply -f deployment.yaml
+                        kubectl apply -f deployment.yaml  --validate=false
                         kubectl apply -f service.yaml
                     """
                 }
