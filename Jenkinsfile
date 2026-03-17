@@ -7,7 +7,7 @@ pipeline {
         SONAR_HOST_URL = "http://192.168.80.140:9000"
         SONAR_LOGIN    = credentials('sonar-token')
 
-        // ✅ Add this (GLOBAL FIX)
+        // ✅ BuildKit socket
         BUILDKIT_HOST  = "unix:///run/buildkit/buildkitd.sock"
     }
 
@@ -39,10 +39,11 @@ pipeline {
         stage('Build Container Image') {
             steps {
                 sh '''
+                echo "🔹 Cleaning old images..."
                 sudo nerdctl image prune -f || true
 
-                # ✅ Build using BuildKit socket
-                sudo nerdctl build -t $IMAGE_NAME:$IMAGE_TAG .
+                echo "🔹 Building image with BuildKit..."
+                sudo -E nerdctl build -t $IMAGE_NAME:$IMAGE_TAG .
                 '''
             }
         }
@@ -55,7 +56,10 @@ pipeline {
                     passwordVariable: 'HPASS'
                 )]) {
                     sh """
+                    echo "🔹 Logging into Harbor..."
                     echo \$HPASS | sudo nerdctl login 192.168.80.140:80 -u \$HUSER --password-stdin --insecure-registry
+
+                    echo "🔹 Pushing image..."
                     sudo nerdctl push --insecure-registry $IMAGE_NAME:$IMAGE_TAG
                     """
                 }
@@ -66,6 +70,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh """
+                        echo "🔹 Deploying to Kubernetes..."
                         kubectl apply -f deployment.yaml --validate=false
                         kubectl apply -f service.yaml
                     """
@@ -73,5 +78,14 @@ pipeline {
             }
         }
 
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline executed successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed! Check logs."
+        }
     }
 }
