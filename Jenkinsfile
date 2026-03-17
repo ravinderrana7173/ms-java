@@ -37,16 +37,17 @@ pipeline {
         }
 
         stage('Build Container Image') {
-            steps {
-                sh '''
-                echo "🔹 Cleaning old images..."
-                sudo nerdctl image prune -f || true
+    steps {
+        sh '''
+        echo "🔹 Cleaning old images..."
+        sudo nerdctl image prune -f || true
 
-                echo "🔹 Building image with BuildKit..."
-                sudo -E nerdctl build -t $IMAGE_NAME:$IMAGE_TAG .
-                '''
-            }
-        }
+        echo "🔹 Building image with explicit BuildKit socket..."
+        sudo BUILDKIT_HOST=unix:///run/buildkit/buildkitd.sock \
+        nerdctl build -t $IMAGE_NAME:$IMAGE_TAG .
+        '''
+    }
+}
 
         stage('Push Image to Harbor') {
             steps {
